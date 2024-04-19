@@ -1,8 +1,8 @@
-import {Modal, Form, Button, Upload, Input, Space} from 'antd';
+import { Modal, Form, Button, Upload, Input, Space } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 
-const UploadModal = ({ visible, handleOk, handleCancel, onFinish }) => {
+const UploadModal = ({ visible, handleCancel, onFinish }) => {
     const [form] = Form.useForm();
     const [fileList, setFileList] = useState([]);
 
@@ -10,13 +10,29 @@ const UploadModal = ({ visible, handleOk, handleCancel, onFinish }) => {
         setFileList(fileList);
     };
 
+    const handleFinish = () => {
+        form.setFieldValue('file', fileList[0].originFileObj);
+        form
+            .validateFields()
+            .then((values) => {
+                const { file, metadata } = values;
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('metadata', JSON.stringify(metadata));
+                onFinish(formData);
+            })
+            .catch((errorInfo) => {
+                console.log('Validation failed:', errorInfo);
+            });
+    };
+
     return (
         <Modal
             title="Upload File"
             visible={visible}
-            onOk={handleOk}
+            onOk={handleFinish}
             onCancel={handleCancel}
-            footer={null} // Remove the default OK and Cancel buttons
+            footer={null}
         >
             <Form
                 form={form}
@@ -64,7 +80,7 @@ const UploadModal = ({ visible, handleOk, handleCancel, onFinish }) => {
                     </Upload>
                 </Form.Item>
                 <Form.Item>
-                    <Button type="primary" htmlType="submit">Submit</Button>
+                    <Button type="primary" htmlType="submit" onClick={handleFinish}>Submit</Button>
                 </Form.Item>
             </Form>
         </Modal>
