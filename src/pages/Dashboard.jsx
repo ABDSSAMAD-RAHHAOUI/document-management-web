@@ -8,6 +8,7 @@ import Sidebar from "../components/Sidebar.jsx";
 import { useCreateDocument, useGetDocuments, useDownloadDocument ,useDeleteDocument} from '../services/DocumentService';
 import {DeleteOutlined, DownloadOutlined, ShareAltOutlined, UploadOutlined} from "@ant-design/icons";
 import ShareModal from "../components/ShareModal.jsx";
+import {render} from "react-dom";
 
 const { Content } = Layout;
 

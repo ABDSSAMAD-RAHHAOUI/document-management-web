@@ -5,11 +5,9 @@ import { useState } from 'react';
 const UploadModal = ({ visible, handleCancel, onFinish }) => {
     const [form] = Form.useForm();
     const [fileList, setFileList] = useState([]);
-
     const handleFileChange = ({ fileList }) => {
         setFileList(fileList);
     };
-
     const handleFinish = () => {
         form.setFieldValue('file', fileList[0].originFileObj);
         form
@@ -18,7 +16,8 @@ const UploadModal = ({ visible, handleCancel, onFinish }) => {
                 const { file, metadata } = values;
                 const formData = new FormData();
                 formData.append('file', file);
-                formData.append('metadata', JSON.stringify(metadata));
+                const metadataBlob = new Blob([JSON.stringify(metadata)], { type: 'application/json' });
+                formData.append('metadata', metadataBlob);
                 onFinish(formData);
             })
             .catch((errorInfo) => {
