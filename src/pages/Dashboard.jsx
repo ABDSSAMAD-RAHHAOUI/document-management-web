@@ -5,7 +5,13 @@ import '../index.css';
 import SearchBar from "../components/SearchBar.jsx";
 import UploadModal from "../components/UploadModal.jsx";
 import Sidebar from "../components/Sidebar.jsx";
-import { useCreateDocument, useGetDocuments, useDownloadDocument ,useDeleteDocument} from '../services/DocumentService';
+import {
+    useCreateDocument,
+    useGetDocuments,
+    useDownloadDocument,
+    useDeleteDocument,
+    useUpdateDocument
+} from '../services/DocumentService';
 import {DeleteOutlined, DownloadOutlined, ShareAltOutlined, UploadOutlined} from "@ant-design/icons";
 import ShareModal from "../components/ShareModal.jsx";
 import {render} from "react-dom";
@@ -20,6 +26,8 @@ const Dashboard = () => {
     const downloadDocumentMutation = useDownloadDocument();
     const [shareModalVisible, setShareModalVisible] = useState(false);
     const deleteDocumentMutation = useDeleteDocument();
+    const updateDocumentMutation = useUpdateDocument();
+    const [selectedRecord, setSelectedRecord] = useState(null);
 
     const handleCancel = () => {
         setModalVisible(false);
@@ -55,12 +63,32 @@ const Dashboard = () => {
         return (sizeInKB / 1024/ 1024).toFixed(2);
     };
 
-    const handleUpload = () => {
+    const handleUpload = (record) => {
+        console.log('record:', record);
+        setSelectedRecord(record);
         setModalVisible(true);
     };
 
     const onFinish = async (formData) => {
-        createDocumentMutation.mutate(formData);
+        if (!selectedRecord || !selectedRecord.documentUUID) {
+            try {
+                await createDocumentMutation.mutateAsync(formData);
+                message.success('Document created successfully');
+            } catch (error) {
+                console.error('Error creating document:', error);
+                message.error('Error creating document');
+            }
+        } else {
+            try {
+                await updateDocumentMutation.mutateAsync({ formData });
+                message.success('Document updated successfully');
+            } catch (error) {
+                console.error('Error updating document:', error);
+                message.error('Error updating document');
+            }
+        }
+        setSelectedRecord(null);
+        setModalVisible(false);
     };
 
     return (
@@ -92,7 +120,7 @@ const Dashboard = () => {
                                     <div>
                                         <Button type="link" onClick={() => handleDownload(record)} icon={<DownloadOutlined />} />
                                         <Button type="link" onClick={() => handleDelete(record)} icon={<DeleteOutlined />} />
-                                        <Button type="link" onClick={() => handleUpload()} icon={<UploadOutlined />} />
+                                        <Button type="link" onClick={() => handleUpload(record)} icon={<UploadOutlined />} />
                                         <Button type="link" onClick={() => handleShare(record)} icon={<ShareAltOutlined />} />
                                     </div>
                                 )}
@@ -103,6 +131,7 @@ const Dashboard = () => {
                         visible={modalVisible}
                         handleCancel={handleCancel}
                         onFinish={onFinish}
+                        documentUUID={selectedRecord ? selectedRecord.documentUUID : null}
                     />
                     <ShareModal
                         visible={shareModalVisible}

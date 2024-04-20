@@ -60,3 +60,15 @@ export function useDeleteDocument() {
         return response.data;
     });
 }
+
+export function useUpdateDocument() {
+    return useMutation(async ({ formData }) => {
+        const response = await axios.put(`${API_BASE_URL}/document`, formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+        return response.data;
+    });
+}
