@@ -16,12 +16,15 @@ const UploadModal = ({ visible, handleCancel, onFinish,documentUUID  }) => {
                 const { file, metadata } = values;
                 const formData = new FormData();
                 formData.append('file', file);
-
+                console.log(metadata)
                 const metadataBlob = new Blob([JSON.stringify(metadata)], { type: 'application/json' });
                 formData.append('metadata', metadataBlob);
                 if (documentUUID) {
-                    formData.append('documentUUID', documentUUID);
-                    onFinish({ formData });
+                    const documentUUIDBlob = new Blob([JSON.stringify(documentUUID)], { type: 'application/json' });
+
+                    formData.append('documentUUID', documentUUIDBlob);
+                    console.log(documentUUID);
+                    onFinish(formData);
                 } else {
                     onFinish(formData);
                 }
