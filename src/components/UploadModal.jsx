@@ -2,7 +2,7 @@ import { Modal, Form, Button, Upload, Input, Space } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 
-const UploadModal = ({ visible, handleCancel, onFinish }) => {
+const UploadModal = ({ visible, handleCancel, onFinish,documentUUID  }) => {
     const [form] = Form.useForm();
     const [fileList, setFileList] = useState([]);
 
@@ -19,7 +19,12 @@ const UploadModal = ({ visible, handleCancel, onFinish }) => {
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('metadata', JSON.stringify(metadata));
-                onFinish(formData);
+                if (documentUUID) {
+                    formData.append('documentUUID', documentUUID);
+                    onFinish({ formData });
+                } else {
+                    onFinish(formData);
+                }
             })
             .catch((errorInfo) => {
                 console.log('Validation failed:', errorInfo);
